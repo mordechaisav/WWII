@@ -38,26 +38,29 @@ def run_query_and_explain(query):
         release_db_connection(conn)
 
 
-def main():
+def main(year):
     create_indexes()
 
     # First query to get the most active air force in 1942
     query1 = """
-    SELECT 
-        air_force, 
-        target_city,
-        COUNT(mission_id) AS mission_count
-    FROM 
-        mission
-    WHERE 
-        EXTRACT(YEAR FROM mission_date) = 1942
-    GROUP BY 
-        air_force, 
-        target_city
-    ORDER BY 
-        mission_count DESC
-    LIMIT 1;
-    """
+        SELECT 
+            air_force, 
+            target_city,
+            COUNT(mission_id) AS mission_count
+        FROM 
+            mission
+        WHERE 
+            EXTRACT(YEAR FROM mission_date) = %s
+        GROUP BY 
+            air_force, 
+            target_city
+        ORDER BY 
+            mission_count DESC
+        LIMIT 1;  
+        """
+
+
+
 
     # Second query to get the maximum bomb damage assessment for bombing missions
     query2 = """
@@ -75,7 +78,7 @@ def main():
     """
 
     # Execute the queries with EXPLAIN ANALYZE
-    explain_result1 = run_query_and_explain(query1)
+    explain_result1 = run_query_and_explain(query1,(year,))
     explain_result2 = run_query_and_explain(query2)
 
     # Document the findings in a text file
@@ -107,4 +110,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(1942)
