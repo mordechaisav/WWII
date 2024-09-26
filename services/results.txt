@@ -1,0 +1,51 @@
+### Query Performance Documentation ###
+
+1. Performance of the queries after index creation:
+   - Query 1: 
+     ('Limit  (cost=6086.81..6086.81 rows=1 width=22) (actual time=47.778..49.078 rows=1 loops=1)',)
+     ('  ->  Sort  (cost=6086.81..6088.99 rows=871 width=22) (actual time=47.777..49.077 rows=1 loops=1)',)
+     ('        Sort Key: (count(mission_id)) DESC',)
+     ('        Sort Method: top-N heapsort  Memory: 25kB',)
+     ('        ->  Finalize GroupAggregate  (cost=5975.11..6082.45 rows=871 width=22) (actual time=46.029..48.923 rows=1088 loops=1)',)
+     ('              Group Key: air_force, target_city',)
+     ('              ->  Gather Merge  (cost=5975.11..6068.18 rows=742 width=22) (actual time=46.019..48.614 rows=1088 loops=1)',)
+     ('                    Workers Planned: 2',)
+     ('                    Workers Launched: 2',)
+     ('                    ->  Partial GroupAggregate  (cost=4975.09..4982.51 rows=371 width=22) (actual time=10.358..10.771 rows=363 loops=3)',)
+     ('                          Group Key: air_force, target_city',)
+     ('                          ->  Sort  (cost=4975.09..4976.02 rows=371 width=18) (actual time=10.353..10.464 rows=2017 loops=3)',)
+     ('                                Sort Key: air_force, target_city',)
+     ('                                Sort Method: quicksort  Memory: 463kB',)
+     ('                                Worker 0:  Sort Method: quicksort  Memory: 25kB',)
+     ('                                Worker 1:  Sort Method: quicksort  Memory: 25kB',)
+     ('                                ->  Parallel Seq Scan on mission  (cost=0.00..4959.26 rows=371 width=18) (actual time=1.615..7.767 rows=2017 loops=3)',)
+     ("                                      Filter: (EXTRACT(year FROM mission_date) = '1942'::numeric)",)
+     ('                                      Rows Removed by Filter: 57410',)
+     ('Planning Time: 5.098 ms',)
+     ('Execution Time: 51.065 ms',)
+   - Query 2: 
+     ('Limit  (cost=418.40..418.42 rows=1 width=41) (actual time=0.118..0.118 rows=1 loops=1)',)
+     ('  ->  GroupAggregate  (cost=418.40..418.96 rows=29 width=41) (actual time=0.117..0.117 rows=1 loops=1)',)
+     ('        Group Key: target_country',)
+     ('        ->  Sort  (cost=418.40..418.49 rows=36 width=34) (actual time=0.114..0.115 rows=2 loops=1)',)
+     ('              Sort Key: target_country',)
+     ('              Sort Method: quicksort  Memory: 27kB',)
+     ('              ->  Index Scan using idx_bomb_damage_assessment on mission  (cost=0.29..417.47 rows=36 width=34) (actual time=0.042..0.094 rows=32 loops=1)',)
+     ('                    Index Cond: (bomb_damage_assessment IS NOT NULL)',)
+     ("                    Filter: ((airborne_aircraft)::numeric > '5'::numeric)",)
+     ('                    Rows Removed by Filter: 72',)
+     ('Planning Time: 1.419 ms',)
+     ('Execution Time: 0.135 ms',)
+
+2. Created indexes:
+   - idx_mission_date on mission(mission_date)
+   - idx_air_force on mission(air_force)
+   - idx_target_city on mission(target_city)
+   - idx_airborne_aircraft on mission("Airborne Aircraft")
+   - idx_bomb_damage_assessment on mission("Bomb Damage Assessment")
+   - idx_target_country on mission("Target Country")
+   - idx_air_force_target_city on mission(air_force, target_city)
+   - idx_airborne_bomb_damage on mission("Airborne Aircraft", "Bomb Damage Assessment")
+
+3. Explanation of the results:
+   - The query results improved because the created indexes allow the database to search quickly based on the selected columns.

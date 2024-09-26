@@ -11,9 +11,11 @@ def create_indexes():
             "CREATE INDEX IF NOT EXISTS idx_mission_date ON mission(mission_date);",
             "CREATE INDEX IF NOT EXISTS idx_air_force ON mission(air_force);",
             "CREATE INDEX IF NOT EXISTS idx_target_city ON mission(target_city);",
-            "CREATE INDEX IF NOT EXISTS idx_airborne_aircraft ON mission(\"Airborne Aircraft\");",
-            "CREATE INDEX IF NOT EXISTS idx_bomb_damage_assessment ON mission(\"Bomb Damage Assessment\");",
-            "CREATE INDEX IF NOT EXISTS idx_target_country ON mission(\"Target Country\");",
+            "CREATE INDEX IF NOT EXISTS idx_airborne_aircraft ON mission(\"airborne_aircraft\");",
+            "CREATE INDEX IF NOT EXISTS idx_bomb_damage_assessment ON mission(\"bomb_damage_assessment\");",
+            "CREATE INDEX IF NOT EXISTS idx_target_country ON mission(\"target_country\");",
+            "CREATE INDEX IF NOT EXISTS idx_air_force_target_city ON mission(air_force, target_city);",
+            "CREATE INDEX IF NOT EXISTS idx_airborne_bomb_damage ON mission(\"airborne_aircraft\", \"bomb_damage_assessment\");"
         ]
 
         for query in index_queries:
@@ -96,6 +98,8 @@ def main():
         f.write("   - idx_airborne_aircraft on mission(\"Airborne Aircraft\")\n")
         f.write("   - idx_bomb_damage_assessment on mission(\"Bomb Damage Assessment\")\n")
         f.write("   - idx_target_country on mission(\"Target Country\")\n")
+        f.write("   - idx_air_force_target_city on mission(air_force, target_city)\n")
+        f.write("   - idx_airborne_bomb_damage on mission(\"Airborne Aircraft\", \"Bomb Damage Assessment\")\n")
 
         f.write("\n3. Explanation of the results:\n")
         f.write(
